@@ -134,6 +134,44 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(loaded.snippets[0].language, "py")
         self.assertTrue(loaded.checklists[0].items[0].done)
 
+    def test_load_missing_file_returns_empty_state(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "nonexistent.json"
+
+            loaded = load_state(path)
+
+        self.assertEqual(len(loaded.notes), 0)
+        self.assertEqual(len(loaded.tasks), 0)
+        self.assertEqual(len(loaded.snippets), 0)
+        self.assertEqual(len(loaded.checklists), 0)
+
+    def test_load_invalid_json_raises(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "state.json"
+
+            path.write_text("{invalid json}", encoding="utf-8")
+
+            with self.assertRaises(ValueError):
+                load_state(path)
+
+    def test_saved_file_contains_json_object(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "state.json"
+
+            save_state(path, WorkbenchState())
+
+            content = path.read_text(encoding="utf-8")
+            self.assertIn("notes", content)
+
+    def test_save_state_creates_parent_directories(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            nested_dir = Path(directory) / "nested" / "deep"
+            path = nested_dir / "state.json"
+
+            save_state(path, WorkbenchState())
+
+            self.assertTrue(nested_dir.exists())
+
 
 if __name__ == "__main__":
     unittest.main()
