@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -9,7 +8,7 @@ from .models import WorkbenchState
 
 
 def state_to_dict(state: WorkbenchState) -> dict[str, Any]:
-    return asdict(state)
+    return state.to_dict()
 
 
 def load_state(path: Path) -> WorkbenchState:
@@ -18,7 +17,7 @@ def load_state(path: Path) -> WorkbenchState:
     data = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise ValueError("Workbench state must be a JSON object")
-    return WorkbenchState(schema_version=int(data.get("schema_version", 1)))
+    return WorkbenchState.from_dict(data)
 
 
 def save_state(path: Path, state: WorkbenchState) -> None:

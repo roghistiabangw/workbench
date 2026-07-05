@@ -3,7 +3,14 @@ import unittest
 from pathlib import Path
 
 from workbench.cli import demo_state, main
-from workbench.models import ChecklistItem, ProjectChecklist, Task, WorkbenchState
+from workbench.models import (
+    ChecklistItem,
+    Note,
+    ProjectChecklist,
+    Snippet,
+    Task,
+    WorkbenchState,
+)
 from workbench.storage import load_state, save_state
 
 
@@ -61,6 +68,71 @@ class WorkbenchSmokeTests(unittest.TestCase):
             state.summary_counts(),
             {"notes": 0, "tasks": 1, "snippets": 0, "checklists": 0},
         )
+
+    def test_state_round_trip_preserves_all(self) -> None:
+        notes = [Note(id="n-1", title="Hello", body="World")]
+        tasks = [Task(id="t-1", title="Do it", status="doing", priority="high")]
+        snippets = [Snippet(id="s-1", title="S", language="js", body="var x=1")]
+        checklists = [
+            ProjectChecklist(
+                id="c-1",
+                name="C",
+                items=[
+                    ChecklistItem(id="i-1", text="A", done=True),
+                    ChecklistItem(id="i-2", text="B"),
+                ],
+            )
+        ]
+
+        state = WorkbenchState(
+            notes=notes,
+            tasks=tasks,
+            snippets=snippets,
+            checklists=checklists,
+            schema_version=1,
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "state.json"
+
+            save_state(path, state)
+            loaded = load_state(path)
+
+        self.assertEqual(loaded.schema_version, 1)
+        self.assertEqual(len(loaded.notes), 1)
+        self.assertEqual(loaded.notes[0].id, "n-1")
+        self.assertEqual(len(loaded.tasks), 1)
+        self.assertEqual(loaded.tasks[0].status, "doing")
+        self.assertEqual(len(loaded.snippets), 1)
+        self.assertEqual(len(loaded.checklists), 1)
+        self.assertEqual(loaded.checklists[0].items[0].done, True)
+
+    def test_save_load_with_data(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "state.json"
+
+            state = WorkbenchState(
+                notes=[Note(id="n-1", title="Saved", body="Content")],
+                tasks=[Task(id="t-1", title="T", status="done")],
+                snippets=[Snippet(id="s-1", title="S", language="py", body="print()")],
+                checklists=[
+                    ProjectChecklist(
+                        id="c-1",
+                        name="CL",
+                        items=[
+                            ChecklistItem(id="i-1", text="X", done=True),
+                        ],
+                    )
+                ],
+            )
+
+            save_state(path, state)
+            loaded = load_state(path)
+
+        self.assertEqual(loaded.notes[0].title, "Saved")
+        self.assertEqual(loaded.tasks[0].status, "done")
+        self.assertEqual(loaded.snippets[0].language, "py")
+        self.assertTrue(loaded.checklists[0].items[0].done)
 
 
 if __name__ == "__main__":
