@@ -20,15 +20,42 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(len(state.notes), 1)
         self.assertEqual(len(state.tasks), 1)
+        self.assertEqual(len(state.snippets), 1)
+        self.assertEqual(len(state.checklists), 1)
 
-    def test_save_and_load_empty_state(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "state.json"
+    def test_demo_note_has_expected_fields(self) -> None:
+        state = demo_state()
+        note = state.notes[0]
 
-            save_state(path, WorkbenchState())
-            loaded = load_state(path)
+        self.assertEqual(note.id, "note-demo")
+        self.assertEqual(note.title, "First note")
+        self.assertIn("demo", note.tags)
 
-        self.assertEqual(loaded.schema_version, 1)
+    def test_demo_task_has_expected_fields(self) -> None:
+        state = demo_state()
+        task = state.tasks[0]
+
+        self.assertEqual(task.id, "task-demo")
+        self.assertEqual(task.title, "Review the workbench plan")
+        self.assertEqual(task.priority, "high")
+
+    def test_demo_snippet_has_expected_fields(self) -> None:
+        state = demo_state()
+        snippet = state.snippets[0]
+
+        self.assertEqual(snippet.id, "snippet-1")
+        self.assertEqual(snippet.title, "Python hello")
+        self.assertEqual(snippet.language, "python")
+
+    def test_demo_checklist_has_expected_fields(self) -> None:
+        state = demo_state()
+        checklist = state.checklists[0]
+
+        self.assertEqual(checklist.id, "cl-demo")
+        self.assertEqual(checklist.name, "Demo checklist")
+        self.assertEqual(len(checklist.items), 2)
+        self.assertFalse(checklist.items[0].done)
+        self.assertTrue(checklist.items[1].done)
 
     def test_demo_command_writes_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -39,6 +66,30 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(result, 0)
         self.assertTrue(exists)
+
+    def test_demo_print_does_not_create_data_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "state.json"
+
+            result = main(["--data", str(path), "demo-print"])
+            exists = path.exists()
+
+        self.assertEqual(result, 0)
+        self.assertFalse(exists)
+
+    def test_demo_print_output_is_json(self) -> None:
+        import io
+        from contextlib import redirect_stdout
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            main(["demo-print"])
+
+        output = buf.getvalue().strip()
+        self.assertIn("note-demo", output)
+        self.assertIn("task-demo", output)
+        self.assertIn("snippet-1", output)
+        self.assertIn("cl-demo", output)
 
     def test_task_state_helpers_preserve_defaults(self) -> None:
         task = Task(id="task-1", title="Review")
