@@ -14,6 +14,7 @@ from workbench.models import (
     WorkbenchState,
 )
 from workbench.storage import load_state, save_state
+from workbench.validation import normalize_tags, require_text, validate_task_status
 
 
 class WorkbenchSmokeTests(unittest.TestCase):
@@ -92,6 +93,16 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertIn("task-demo", output)
         self.assertIn("snippet-1", output)
         self.assertIn("cl-demo", output)
+
+
+    def test_validation_helpers_normalize_and_validate(self) -> None:
+        self.assertEqual(normalize_tags([" Work ", "work", "", "Bug"]), ["work", "bug"])
+        self.assertEqual(require_text("  Title  ", "title"), "Title")
+        self.assertEqual(validate_task_status("todo"), "todo")
+        with self.assertRaises(ValueError):
+            require_text(" ", "title")
+        with self.assertRaises(ValueError):
+            validate_task_status("later")
 
     def test_generate_short_id_uses_prefix(self) -> None:
         generated = generate_short_id("note", size=6)
