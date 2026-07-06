@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
+import uuid
+from typing import Any, Iterable
 
 
 TASK_STATUSES = ("todo", "doing", "blocked", "done")
@@ -12,6 +13,17 @@ CHECKLIST_STATUSES = ("active", "paused", "complete", "archived")
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def generate_short_id(prefix: str, existing_ids: Iterable[str] | None = None, size: int = 8) -> str:
+    clean_prefix = prefix.strip().lower().replace("_", "-")
+    if not clean_prefix:
+        raise ValueError("ID prefix is required")
+    taken = set(existing_ids or [])
+    while True:
+        candidate = f"{clean_prefix}-{uuid.uuid4().hex[:size]}"
+        if candidate not in taken:
+            return candidate
 
 
 @dataclass

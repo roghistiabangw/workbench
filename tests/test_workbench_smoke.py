@@ -2,9 +2,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from workbench import models as models_module
 from workbench.cli import demo_state, main
 from workbench.models import (
     ChecklistItem,
+    generate_short_id,
     Note,
     ProjectChecklist,
     Snippet,
@@ -90,6 +92,31 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertIn("task-demo", output)
         self.assertIn("snippet-1", output)
         self.assertIn("cl-demo", output)
+
+    def test_generate_short_id_uses_prefix(self) -> None:
+        generated = generate_short_id("note", size=6)
+
+        self.assertTrue(generated.startswith("note-"))
+        self.assertEqual(len(generated), len("note-") + 6)
+
+    def test_generate_short_id_avoids_existing_ids(self) -> None:
+        class FakeUuid:
+            def __init__(self, value: str) -> None:
+                self.hex = value
+
+        values = [FakeUuid("aaaaaaaa"), FakeUuid("bbbbbbbb")]
+        original_uuid4 = models_module.uuid.uuid4
+        models_module.uuid.uuid4 = lambda: values.pop(0)
+        try:
+            generated = generate_short_id("task", existing_ids={"task-aaaaaaaa"})
+        finally:
+            models_module.uuid.uuid4 = original_uuid4
+
+        self.assertEqual(generated, "task-bbbbbbbb")
+
+    def test_generate_short_id_rejects_empty_prefix(self) -> None:
+        with self.assertRaises(ValueError):
+            generate_short_id("  ")
 
     def test_task_state_helpers_preserve_defaults(self) -> None:
         task = Task(id="task-1", title="Review")
