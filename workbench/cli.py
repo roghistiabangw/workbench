@@ -65,6 +65,11 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("summary")
     demo_print = subparsers.add_parser("demo-print")
     demo_print.set_defaults(_print_demo=True)
+
+    notes_cmd = subparsers.add_parser("notes")
+    tasks_cmd = subparsers.add_parser("tasks")
+    snippets_cmd = subparsers.add_parser("snippets")
+    checklists_cmd = subparsers.add_parser("checklists")
     return parser
 
 
@@ -87,6 +92,23 @@ def main(argv: list[str] | None = None) -> int:
             f"notes={len(state.notes)} tasks={len(state.tasks)} "
             f"snippets={len(state.snippets)} checklists={len(state.checklists)}"
         )
+        return 0
+
+    if args.command == "notes":
+        state = load_state(args.data)
+        print(f"notes={len(state.notes)}")
+        return 0
+    if args.command == "tasks":
+        state = load_state(args.data)
+        print(f"tasks={len(state.tasks)}")
+        return 0
+    if args.command == "snippets":
+        state = load_state(args.data)
+        print(f"snippets={len(state.snippets)}")
+        return 0
+    if args.command == "checklists":
+        state = load_state(args.data)
+        print(f"checklists={len(state.checklists)}")
         return 0
 
     parser.print_help()

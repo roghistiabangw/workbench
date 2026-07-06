@@ -223,6 +223,17 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
             self.assertTrue(nested_dir.exists())
 
+    def test_all_commands_return_zero(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "state.json"
+
+            main(["--data", str(path), "demo"])
+
+            for command in ("notes", "tasks", "snippets", "checklists"):
+                result = main(["--data", str(path), command])
+
+        self.assertEqual(result, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
