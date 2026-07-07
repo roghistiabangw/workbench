@@ -14,6 +14,10 @@ from workbench.models import (
     WorkbenchState,
 )
 from workbench.storage import load_state, save_state
+from workbench.services import (
+    list_notes,
+    create_note,
+)
 from workbench.validation import normalize_tags, require_text, validate_task_status
 
 
@@ -271,6 +275,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
                 result = main(["--data", str(path), command])
 
         self.assertEqual(result, 0)
+    def test_create_and_list_notes(self) -> None:
+        state = WorkbenchState()
+        note = create_note(state, " New note ", "Body", ["Work", "work"])
+
+        self.assertEqual(note.title, "New note")
+        self.assertEqual(note.tags, ["work"])
+        self.assertEqual(list_notes(state), [note])
+
 
 
 if __name__ == "__main__":
