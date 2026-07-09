@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    update_note,
+    get_note,
     list_notes,
     create_note,
 )
@@ -282,6 +284,17 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(note.title, "New note")
         self.assertEqual(note.tags, ["work"])
         self.assertEqual(list_notes(state), [note])
+
+    def test_get_and_update_note(self) -> None:
+        state = WorkbenchState()
+        note = create_note(state, "Old", "Body")
+
+        updated = update_note(state, note.id, title="New", tags=["A", "a"])
+
+        self.assertEqual(get_note(state, note.id).title, "New")
+        self.assertEqual(updated.tags, ["a"])
+        with self.assertRaises(ValueError):
+            get_note(state, "missing")
 
 
 

@@ -14,6 +14,8 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    update_note,
+    get_note,
     list_notes,
     create_note,
 )
@@ -80,6 +82,14 @@ def build_parser() -> argparse.ArgumentParser:
     note_add.add_argument("--body", default="")
     note_add.add_argument("--tag", action="append", default=[])
     subparsers.add_parser("note-list")
+
+    note_show = subparsers.add_parser("note-show")
+    note_show.add_argument("note_id")
+    note_update = subparsers.add_parser("note-update")
+    note_update.add_argument("note_id")
+    note_update.add_argument("--title")
+    note_update.add_argument("--body")
+    note_update.add_argument("--tag", action="append")
     return parser
 
 
@@ -132,6 +142,19 @@ def main(argv: list[str] | None = None) -> int:
         state = load_state(args.data)
         for note in list_notes(state):
             print(f"{note.id} {note.title}")
+        return 0
+
+
+    if args.command == "note-show":
+        state = load_state(args.data)
+        note = get_note(state, args.note_id)
+        print(f"{note.id} {note.title}\n{note.body}")
+        return 0
+    if args.command == "note-update":
+        state = load_state(args.data)
+        note = update_note(state, args.note_id, args.title, args.body, args.tag)
+        save_state(args.data, state)
+        print(note.id)
         return 0
 
     parser.print_help()
