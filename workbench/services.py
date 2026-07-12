@@ -63,3 +63,31 @@ def restore_note(state: WorkbenchState, note_id: str) -> Note:
     note.updated_at = utc_now()
     return note
 
+
+def create_task(
+    state: WorkbenchState,
+    title: str,
+    priority: str = "normal",
+    owner: str = "",
+    due_date: str = "",
+    tags: list[str] | None = None,
+) -> Task:
+    existing_ids = {task.id for task in state.tasks}
+    now = utc_now()
+    task = Task(
+        id=generate_short_id("task", existing_ids),
+        title=require_text(title, "title"),
+        priority=validate_task_priority(priority),
+        owner=owner,
+        due_date=due_date,
+        tags=normalize_tags(tags),
+        created_at=now,
+        updated_at=now,
+    )
+    state.tasks.append(task)
+    return task
+
+
+def list_tasks(state: WorkbenchState) -> list[Task]:
+    return list(state.tasks)
+

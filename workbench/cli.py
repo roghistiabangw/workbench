@@ -14,6 +14,8 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    list_tasks,
+    create_task,
     restore_note,
     archive_note,
     update_note,
@@ -97,6 +99,14 @@ def build_parser() -> argparse.ArgumentParser:
     note_archive.add_argument("note_id")
     note_restore = subparsers.add_parser("note-restore")
     note_restore.add_argument("note_id")
+
+    task_add = subparsers.add_parser("task-add")
+    task_add.add_argument("--title", required=True)
+    task_add.add_argument("--priority", default="normal")
+    task_add.add_argument("--owner", default="")
+    task_add.add_argument("--due-date", default="")
+    task_add.add_argument("--tag", action="append", default=[])
+    subparsers.add_parser("task-list")
     return parser
 
 
@@ -176,6 +186,19 @@ def main(argv: list[str] | None = None) -> int:
         restore_note(state, args.note_id)
         save_state(args.data, state)
         print(args.note_id)
+        return 0
+
+
+    if args.command == "task-add":
+        state = load_state(args.data)
+        task = create_task(state, args.title, args.priority, args.owner, args.due_date, args.tag)
+        save_state(args.data, state)
+        print(task.id)
+        return 0
+    if args.command == "task-list":
+        state = load_state(args.data)
+        for task in list_tasks(state):
+            print(f"{task.id} {task.status} {task.title}")
         return 0
 
     parser.print_help()
