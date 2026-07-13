@@ -14,6 +14,8 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    update_task_status,
+    get_task,
     list_tasks,
     create_task,
     restore_note,
@@ -107,6 +109,10 @@ def build_parser() -> argparse.ArgumentParser:
     task_add.add_argument("--due-date", default="")
     task_add.add_argument("--tag", action="append", default=[])
     subparsers.add_parser("task-list")
+
+    task_status = subparsers.add_parser("task-status")
+    task_status.add_argument("task_id")
+    task_status.add_argument("status")
     return parser
 
 
@@ -199,6 +205,14 @@ def main(argv: list[str] | None = None) -> int:
         state = load_state(args.data)
         for task in list_tasks(state):
             print(f"{task.id} {task.status} {task.title}")
+        return 0
+
+
+    if args.command == "task-status":
+        state = load_state(args.data)
+        task = update_task_status(state, args.task_id, args.status)
+        save_state(args.data, state)
+        print(f"{task.id} {task.status}")
         return 0
 
     parser.print_help()

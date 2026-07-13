@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    update_task_status,
+    get_task,
     list_tasks,
     create_task,
     restore_note,
@@ -317,6 +319,16 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(task.priority, "high")
         self.assertEqual(task.tags, ["launch"])
         self.assertEqual(list_tasks(state), [task])
+
+    def test_update_task_status(self) -> None:
+        state = WorkbenchState()
+        task = create_task(state, "Ship")
+
+        update_task_status(state, task.id, "doing")
+
+        self.assertEqual(get_task(state, task.id).status, "doing")
+        with self.assertRaises(ValueError):
+            update_task_status(state, task.id, "later")
 
 
 
