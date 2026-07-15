@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    filter_tasks,
     update_task_status,
     get_task,
     list_tasks,
@@ -329,6 +330,16 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(get_task(state, task.id).status, "doing")
         with self.assertRaises(ValueError):
             update_task_status(state, task.id, "later")
+
+    def test_filter_tasks(self) -> None:
+        state = WorkbenchState()
+        first = create_task(state, "A", priority="high", owner="me", due_date="2030-01-01", tags=["Work"])
+        create_task(state, "B", priority="low", owner="you", due_date="2030-02-01", tags=["Home"])
+
+        self.assertEqual(filter_tasks(state, priority="high"), [first])
+        self.assertEqual(filter_tasks(state, owner="me"), [first])
+        self.assertEqual(filter_tasks(state, tag="work"), [first])
+        self.assertEqual(filter_tasks(state, due_to="2030-01-15"), [first])
 
 
 

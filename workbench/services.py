@@ -105,3 +105,31 @@ def update_task_status(state: WorkbenchState, task_id: str, status: str) -> Task
     task.updated_at = utc_now()
     return task
 
+
+def filter_tasks(
+    state: WorkbenchState,
+    status: str | None = None,
+    owner: str | None = None,
+    priority: str | None = None,
+    tag: str | None = None,
+    due_from: str | None = None,
+    due_to: str | None = None,
+) -> list[Task]:
+    tasks = list_tasks(state)
+    if status:
+        validate_task_status(status)
+        tasks = [task for task in tasks if task.status == status]
+    if owner:
+        tasks = [task for task in tasks if task.owner == owner]
+    if priority:
+        validate_task_priority(priority)
+        tasks = [task for task in tasks if task.priority == priority]
+    if tag:
+        normalized = normalize_tags([tag])[0]
+        tasks = [task for task in tasks if normalized in task.tags]
+    if due_from:
+        tasks = [task for task in tasks if task.due_date and task.due_date >= due_from]
+    if due_to:
+        tasks = [task for task in tasks if task.due_date and task.due_date <= due_to]
+    return tasks
+

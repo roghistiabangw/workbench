@@ -14,6 +14,7 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    filter_tasks,
     update_task_status,
     get_task,
     list_tasks,
@@ -108,7 +109,13 @@ def build_parser() -> argparse.ArgumentParser:
     task_add.add_argument("--owner", default="")
     task_add.add_argument("--due-date", default="")
     task_add.add_argument("--tag", action="append", default=[])
-    subparsers.add_parser("task-list")
+    task_list = subparsers.add_parser("task-list")
+    task_list.add_argument("--status")
+    task_list.add_argument("--owner")
+    task_list.add_argument("--priority")
+    task_list.add_argument("--tag")
+    task_list.add_argument("--due-from")
+    task_list.add_argument("--due-to")
 
     task_status = subparsers.add_parser("task-status")
     task_status.add_argument("task_id")
@@ -203,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "task-list":
         state = load_state(args.data)
-        for task in list_tasks(state):
+        for task in filter_tasks(state, args.status, args.owner, args.priority, args.tag, args.due_from, args.due_to):
             print(f"{task.id} {task.status} {task.title}")
         return 0
 
