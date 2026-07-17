@@ -133,3 +133,17 @@ def filter_tasks(
         tasks = [task for task in tasks if task.due_date and task.due_date <= due_to]
     return tasks
 
+
+def task_summary_counts(state: WorkbenchState) -> dict[str, dict[str, int]]:
+    summary = {
+        "status": {},
+        "priority": {},
+        "owner": {},
+    }
+    for task in state.tasks:
+        summary["status"][task.status] = summary["status"].get(task.status, 0) + 1
+        summary["priority"][task.priority] = summary["priority"].get(task.priority, 0) + 1
+        owner = task.owner or "unassigned"
+        summary["owner"][owner] = summary["owner"].get(owner, 0) + 1
+    return summary
+

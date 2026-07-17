@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    task_summary_counts,
     filter_tasks,
     update_task_status,
     get_task,
@@ -340,6 +341,19 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(filter_tasks(state, owner="me"), [first])
         self.assertEqual(filter_tasks(state, tag="work"), [first])
         self.assertEqual(filter_tasks(state, due_to="2030-01-15"), [first])
+
+    def test_task_summary_counts(self) -> None:
+        state = WorkbenchState()
+        create_task(state, "A", priority="high", owner="me")
+        other = create_task(state, "B", priority="low")
+        update_task_status(state, other.id, "done")
+
+        summary = task_summary_counts(state)
+
+        self.assertEqual(summary["status"]["todo"], 1)
+        self.assertEqual(summary["status"]["done"], 1)
+        self.assertEqual(summary["owner"]["me"], 1)
+        self.assertEqual(summary["owner"]["unassigned"], 1)
 
 
 
