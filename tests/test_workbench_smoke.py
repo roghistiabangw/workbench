@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    list_snippets,
+    create_snippet,
     task_summary_counts,
     filter_tasks,
     update_task_status,
@@ -354,6 +356,15 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(summary["status"]["done"], 1)
         self.assertEqual(summary["owner"]["me"], 1)
         self.assertEqual(summary["owner"]["unassigned"], 1)
+
+    def test_create_and_list_snippets(self) -> None:
+        state = WorkbenchState()
+        snippet = create_snippet(state, " Sort ", "python", "print(1)", ["Util", "util"])
+
+        self.assertEqual(snippet.title, "Sort")
+        self.assertEqual(snippet.language, "python")
+        self.assertEqual(snippet.tags, ["util"])
+        self.assertEqual(list_snippets(state), [snippet])
 
 
 

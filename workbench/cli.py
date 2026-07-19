@@ -14,6 +14,8 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    list_snippets,
+    create_snippet,
     task_summary_counts,
     filter_tasks,
     update_task_status,
@@ -123,6 +125,14 @@ def build_parser() -> argparse.ArgumentParser:
     task_status.add_argument("status")
 
     subparsers.add_parser("task-summary")
+
+    snippet_add = subparsers.add_parser("snippet-add")
+    snippet_add.add_argument("--title", required=True)
+    snippet_add.add_argument("--language", required=True)
+    snippet_add.add_argument("--body", default="")
+    snippet_add.add_argument("--tag", action="append", default=[])
+    snippet_add.add_argument("--source", default="")
+    subparsers.add_parser("snippet-list")
     return parser
 
 
@@ -229,6 +239,19 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "task-summary":
         state = load_state(args.data)
         print(json.dumps(task_summary_counts(state), ensure_ascii=False, sort_keys=True))
+        return 0
+
+
+    if args.command == "snippet-add":
+        state = load_state(args.data)
+        snippet = create_snippet(state, args.title, args.language, args.body, args.tag, args.source)
+        save_state(args.data, state)
+        print(snippet.id)
+        return 0
+    if args.command == "snippet-list":
+        state = load_state(args.data)
+        for snippet in list_snippets(state):
+            print(f"{snippet.id} {snippet.title}")
         return 0
 
     parser.print_help()

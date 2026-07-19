@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from .models import Note, Task, WorkbenchState, generate_short_id, utc_now
+from .models import Note, Task, WorkbenchState, generate_short_id, utc_now, Snippet
 from .validation import normalize_tags, require_text, validate_task_priority, validate_task_status
 
 
@@ -146,4 +146,23 @@ def task_summary_counts(state: WorkbenchState) -> dict[str, dict[str, int]]:
         owner = task.owner or "unassigned"
         summary["owner"][owner] = summary["owner"].get(owner, 0) + 1
     return summary
+
+
+def create_snippet(state: WorkbenchState, title: str, language: str, body: str, tags: list[str] | None = None, source: str = "") -> Snippet:
+    existing_ids = {snippet.id for snippet in state.snippets}
+    new_snippet = Snippet(
+        id=generate_short_id("snip", existing_ids),
+        title=require_text(title, "title"),
+        language=require_text(language, "language"),
+        body=body,
+        tags=normalize_tags(tags),
+        source=source,
+        created_at=utc_now(),
+    )
+    state.snippets.append(new_snippet)
+    return new_snippet
+
+
+def list_snippets(state: WorkbenchState) -> list[Snippet]:
+    return list(state.snippets)
 
