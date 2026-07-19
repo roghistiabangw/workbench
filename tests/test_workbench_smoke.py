@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    search_snippets,
     list_snippets,
     create_snippet,
     task_summary_counts,
@@ -365,6 +366,15 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(snippet.language, "python")
         self.assertEqual(snippet.tags, ["util"])
         self.assertEqual(list_snippets(state), [snippet])
+
+    def test_search_snippets(self) -> None:
+        state = WorkbenchState()
+        first = create_snippet(state, "Bubble sort", "python", "swap values")
+        create_snippet(state, "HTTP client", "go", "send request")
+
+        results = search_snippets(state, "SORT")
+
+        self.assertEqual(results, [first])
 
 
 

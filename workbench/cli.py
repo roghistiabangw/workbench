@@ -14,6 +14,7 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    search_snippets,
     list_snippets,
     create_snippet,
     task_summary_counts,
@@ -133,6 +134,9 @@ def build_parser() -> argparse.ArgumentParser:
     snippet_add.add_argument("--tag", action="append", default=[])
     snippet_add.add_argument("--source", default="")
     subparsers.add_parser("snippet-list")
+
+    snippet_search = subparsers.add_parser("snippet-search")
+    snippet_search.add_argument("--query", required=True)
     return parser
 
 
@@ -251,6 +255,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "snippet-list":
         state = load_state(args.data)
         for snippet in list_snippets(state):
+            print(f"{snippet.id} {snippet.title}")
+        return 0
+
+
+    if args.command == "snippet-search":
+        state = load_state(args.data)
+        for snippet in search_snippets(state, args.query):
             print(f"{snippet.id} {snippet.title}")
         return 0
 

@@ -166,3 +166,15 @@ def create_snippet(state: WorkbenchState, title: str, language: str, body: str, 
 def list_snippets(state: WorkbenchState) -> list[Snippet]:
     return list(state.snippets)
 
+
+def search_snippets(state: WorkbenchState, query: str) -> list[Snippet]:
+    needle = query.strip().lower()
+    if not needle:
+        return list(state.snippets)
+    matches = []
+    for snippet in state.snippets:
+        haystack = " ".join([snippet.title, snippet.language, snippet.body, " ".join(snippet.tags)]).lower()
+        if needle in haystack:
+            matches.append(snippet)
+    return matches
+
