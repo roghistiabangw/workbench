@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    export_snippets,
     search_snippets,
     list_snippets,
     create_snippet,
@@ -375,6 +376,16 @@ class WorkbenchSmokeTests(unittest.TestCase):
         results = search_snippets(state, "SORT")
 
         self.assertEqual(results, [first])
+
+    def test_export_snippets(self) -> None:
+        state = WorkbenchState()
+        snippet = create_snippet(state, "Sort", "python", "body", ["util"])
+
+        exported = export_snippets(state)
+
+        self.assertEqual(len(exported), 1)
+        self.assertEqual(exported[0]["id"], snippet.id)
+        self.assertEqual(exported[0]["language"], "python")
 
 
 

@@ -178,3 +178,7 @@ def search_snippets(state: WorkbenchState, query: str) -> list[Snippet]:
             matches.append(snippet)
     return matches
 
+
+def export_snippets(state: WorkbenchState) -> list[dict]:
+    return [snippet.to_dict() for snippet in state.snippets]
+
