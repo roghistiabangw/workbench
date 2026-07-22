@@ -14,6 +14,8 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    list_checklists,
+    create_checklist,
     export_snippets,
     search_snippets,
     list_snippets,
@@ -140,6 +142,11 @@ def build_parser() -> argparse.ArgumentParser:
     snippet_search.add_argument("--query", required=True)
 
     subparsers.add_parser("snippet-export")
+
+    checklist_add = subparsers.add_parser("checklist-add")
+    checklist_add.add_argument("--name", required=True)
+    checklist_add.add_argument("--description", default="")
+    subparsers.add_parser("checklist-list")
     return parser
 
 
@@ -272,6 +279,19 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "snippet-export":
         state = load_state(args.data)
         print(json.dumps(export_snippets(state), ensure_ascii=False, sort_keys=True))
+        return 0
+
+
+    if args.command == "checklist-add":
+        state = load_state(args.data)
+        checklist = create_checklist(state, args.name, args.description)
+        save_state(args.data, state)
+        print(checklist.id)
+        return 0
+    if args.command == "checklist-list":
+        state = load_state(args.data)
+        for checklist in list_checklists(state):
+            print(f"{checklist.id} {checklist.name}")
         return 0
 
     parser.print_help()

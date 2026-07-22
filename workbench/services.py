@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from .models import Note, Task, WorkbenchState, generate_short_id, utc_now, Snippet
+from .models import Note, Task, WorkbenchState, generate_short_id, utc_now, Snippet, ProjectChecklist
 from .validation import normalize_tags, require_text, validate_task_priority, validate_task_status
 
 
@@ -181,4 +181,26 @@ def search_snippets(state: WorkbenchState, query: str) -> list[Snippet]:
 
 def export_snippets(state: WorkbenchState) -> list[dict]:
     return [snippet.to_dict() for snippet in state.snippets]
+
+
+def create_checklist(state: WorkbenchState, name: str, description: str = "") -> ProjectChecklist:
+    existing_ids = {checklist.id for checklist in state.checklists}
+    checklist = ProjectChecklist(
+        id=generate_short_id("chk", existing_ids),
+        name=require_text(name, "name"),
+        description=description,
+    )
+    state.checklists.append(checklist)
+    return checklist
+
+
+def list_checklists(state: WorkbenchState) -> list[ProjectChecklist]:
+    return list(state.checklists)
+
+
+def get_checklist(state: WorkbenchState, checklist_id: str) -> ProjectChecklist:
+    for checklist in state.checklists:
+        if checklist.id == checklist_id:
+            return checklist
+    raise ValueError(f"Unknown checklist ID: {checklist_id}")
 

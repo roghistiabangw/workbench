@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    list_checklists,
+    create_checklist,
     export_snippets,
     search_snippets,
     list_snippets,
@@ -386,6 +388,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(len(exported), 1)
         self.assertEqual(exported[0]["id"], snippet.id)
         self.assertEqual(exported[0]["language"], "python")
+
+    def test_create_and_list_checklists(self) -> None:
+        state = WorkbenchState()
+        checklist = create_checklist(state, " Launch ", "Ship it")
+
+        self.assertEqual(checklist.name, "Launch")
+        self.assertEqual(checklist.description, "Ship it")
+        self.assertEqual(list_checklists(state), [checklist])
 
 
 
