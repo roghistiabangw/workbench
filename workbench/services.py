@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from .models import Note, Task, WorkbenchState, generate_short_id, utc_now, Snippet, ProjectChecklist
+from .models import Note, Task, WorkbenchState, generate_short_id, utc_now, Snippet, ProjectChecklist, ChecklistItem
 from .validation import normalize_tags, require_text, validate_task_priority, validate_task_status
 
 
@@ -203,4 +203,20 @@ def get_checklist(state: WorkbenchState, checklist_id: str) -> ProjectChecklist:
         if checklist.id == checklist_id:
             return checklist
     raise ValueError(f"Unknown checklist ID: {checklist_id}")
+
+
+def add_checklist_item(state: WorkbenchState, checklist_id: str, text: str) -> ChecklistItem:
+    checklist = get_checklist(state, checklist_id)
+    existing_ids = {item.id for item in checklist.items}
+    item = ChecklistItem(
+        id=generate_short_id("item", existing_ids),
+        text=require_text(text, "text"),
+    )
+    checklist.items.append(item)
+    checklist.updated_at = utc_now()
+    return item
+
+
+def list_checklist_items(state: WorkbenchState, checklist_id: str) -> list[ChecklistItem]:
+    return list(get_checklist(state, checklist_id).items)
 

@@ -14,6 +14,8 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    list_checklist_items,
+    add_checklist_item,
     list_checklists,
     create_checklist,
     export_snippets,
@@ -147,6 +149,12 @@ def build_parser() -> argparse.ArgumentParser:
     checklist_add.add_argument("--name", required=True)
     checklist_add.add_argument("--description", default="")
     subparsers.add_parser("checklist-list")
+
+    checklist_item_add = subparsers.add_parser("checklist-item-add")
+    checklist_item_add.add_argument("--checklist", required=True)
+    checklist_item_add.add_argument("--text", required=True)
+    checklist_items = subparsers.add_parser("checklist-items")
+    checklist_items.add_argument("--checklist", required=True)
     return parser
 
 
@@ -292,6 +300,20 @@ def main(argv: list[str] | None = None) -> int:
         state = load_state(args.data)
         for checklist in list_checklists(state):
             print(f"{checklist.id} {checklist.name}")
+        return 0
+
+
+    if args.command == "checklist-item-add":
+        state = load_state(args.data)
+        item = add_checklist_item(state, args.checklist, args.text)
+        save_state(args.data, state)
+        print(item.id)
+        return 0
+    if args.command == "checklist-items":
+        state = load_state(args.data)
+        for item in list_checklist_items(state, args.checklist):
+            mark = "x" if item.done else " "
+            print(f"[{mark}] {item.id} {item.text}")
         return 0
 
     parser.print_help()
