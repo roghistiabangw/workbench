@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    checklist_progress,
+    set_checklist_item_done,
     list_checklist_items,
     add_checklist_item,
     list_checklists,
@@ -407,6 +409,19 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(item.text, "Write docs")
         self.assertFalse(item.done)
         self.assertEqual(list_checklist_items(state, checklist.id), [item])
+
+    def test_checklist_progress_service(self) -> None:
+        state = WorkbenchState()
+        checklist = create_checklist(state, "Launch")
+        first = add_checklist_item(state, checklist.id, "A")
+        add_checklist_item(state, checklist.id, "B")
+
+        set_checklist_item_done(state, checklist.id, first.id)
+        progress = checklist_progress(state, checklist.id)
+
+        self.assertEqual(progress["total"], 2)
+        self.assertEqual(progress["completed"], 1)
+        self.assertEqual(progress["percent"], 50)
 
 
 

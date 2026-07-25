@@ -14,6 +14,8 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    checklist_progress,
+    set_checklist_item_done,
     list_checklist_items,
     add_checklist_item,
     list_checklists,
@@ -155,6 +157,13 @@ def build_parser() -> argparse.ArgumentParser:
     checklist_item_add.add_argument("--text", required=True)
     checklist_items = subparsers.add_parser("checklist-items")
     checklist_items.add_argument("--checklist", required=True)
+
+    checklist_item_done = subparsers.add_parser("checklist-item-done")
+    checklist_item_done.add_argument("--checklist", required=True)
+    checklist_item_done.add_argument("--item", required=True)
+    checklist_item_done.add_argument("--undone", action="store_true")
+    checklist_progress_cmd = subparsers.add_parser("checklist-progress")
+    checklist_progress_cmd.add_argument("--checklist", required=True)
     return parser
 
 
@@ -314,6 +323,17 @@ def main(argv: list[str] | None = None) -> int:
         for item in list_checklist_items(state, args.checklist):
             mark = "x" if item.done else " "
             print(f"[{mark}] {item.id} {item.text}")
+        return 0
+
+
+    if args.command == "checklist-item-done":
+        state = load_state(args.data)
+        set_checklist_item_done(state, args.checklist, args.item, not args.undone)
+        save_state(args.data, state)
+        return 0
+    if args.command == "checklist-progress":
+        state = load_state(args.data)
+        print(json.dumps(checklist_progress(state, args.checklist), ensure_ascii=False, sort_keys=True))
         return 0
 
     parser.print_help()

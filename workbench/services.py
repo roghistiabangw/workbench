@@ -220,3 +220,22 @@ def add_checklist_item(state: WorkbenchState, checklist_id: str, text: str) -> C
 def list_checklist_items(state: WorkbenchState, checklist_id: str) -> list[ChecklistItem]:
     return list(get_checklist(state, checklist_id).items)
 
+
+def set_checklist_item_done(state: WorkbenchState, checklist_id: str, item_id: str, done: bool = True) -> ChecklistItem:
+    checklist = get_checklist(state, checklist_id)
+    for item in checklist.items:
+        if item.id == item_id:
+            item.done = bool(done)
+            checklist.updated_at = utc_now()
+            return item
+    raise ValueError(f"Unknown checklist item ID: {item_id}")
+
+
+def checklist_progress(state: WorkbenchState, checklist_id: str) -> dict:
+    checklist = get_checklist(state, checklist_id)
+    return {
+        "total": checklist.total_items,
+        "completed": checklist.completed_items,
+        "percent": checklist.progress_percent,
+    }
+
