@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    recent_events,
+    log_event,
     checklist_progress,
     set_checklist_item_done,
     list_checklist_items,
@@ -422,6 +424,15 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(progress["total"], 2)
         self.assertEqual(progress["completed"], 1)
         self.assertEqual(progress["percent"], 50)
+
+    def test_activity_log_records_events(self) -> None:
+        events: list[dict] = []
+        log_event(events, "create", "note", "note-1")
+        log_event(events, "update", "task", "task-9")
+
+        self.assertEqual(len(events), 2)
+        self.assertEqual(events[0]["action"], "create")
+        self.assertEqual(recent_events(events, 1)[0]["record_id"], "task-9")
 
 
 

@@ -239,3 +239,20 @@ def checklist_progress(state: WorkbenchState, checklist_id: str) -> dict:
         "percent": checklist.progress_percent,
     }
 
+
+def log_event(events: list[dict], action: str, record_type: str, record_id: str) -> dict:
+    entry = {
+        "action": action,
+        "record_type": record_type,
+        "record_id": record_id,
+        "at": utc_now(),
+    }
+    events.append(entry)
+    return entry
+
+
+def recent_events(events: list[dict], limit: int = 10) -> list[dict]:
+    if limit <= 0:
+        return []
+    return list(events[-limit:])
+
