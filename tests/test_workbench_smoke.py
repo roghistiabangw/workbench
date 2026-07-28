@@ -15,6 +15,10 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    is_overdue,
+    days_until,
+    format_date,
+    parse_date,
     recent_events,
     log_event,
     checklist_progress,
@@ -433,6 +437,15 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(len(events), 2)
         self.assertEqual(events[0]["action"], "create")
         self.assertEqual(recent_events(events, 1)[0]["record_id"], "task-9")
+
+    def test_date_utilities(self) -> None:
+        from datetime import date
+
+        self.assertEqual(format_date(parse_date(" 2026-01-02 ")), "2026-01-02")
+        self.assertEqual(days_until("2026-01-10", date(2026, 1, 1)), 9)
+        self.assertTrue(is_overdue("2025-12-31", date(2026, 1, 1)))
+        with self.assertRaises(ValueError):
+            parse_date("not-a-date")
 
 
 
