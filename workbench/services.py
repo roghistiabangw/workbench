@@ -257,3 +257,23 @@ def recent_events(events: list[dict], limit: int = 10) -> list[dict]:
         return []
     return list(events[-limit:])
 
+
+def collect_tags(state: WorkbenchState) -> list[str]:
+    tags: set[str] = set()
+    for note in state.notes:
+        tags.update(note.tags)
+    for task in state.tasks:
+        tags.update(task.tags)
+    for snippet in state.snippets:
+        tags.update(snippet.tags)
+    return sorted(tags)
+
+
+def tag_summary(state: WorkbenchState) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for collection in (state.notes, state.tasks, state.snippets):
+        for record in collection:
+            for tag in record.tags:
+                counts[tag] = counts.get(tag, 0) + 1
+    return counts
+

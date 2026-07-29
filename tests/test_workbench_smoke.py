@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    tag_summary,
+    collect_tags,
     is_overdue,
     days_until,
     format_date,
@@ -446,6 +448,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertTrue(is_overdue("2025-12-31", date(2026, 1, 1)))
         with self.assertRaises(ValueError):
             parse_date("not-a-date")
+
+    def test_tag_utilities(self) -> None:
+        state = WorkbenchState()
+        create_note(state, "N", "b", ["work", "urgent"])
+        create_task(state, "T", tags=["work"])
+
+        self.assertEqual(collect_tags(state), ["urgent", "work"])
+        self.assertEqual(tag_summary(state)["work"], 2)
 
 
 
