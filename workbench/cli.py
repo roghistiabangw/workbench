@@ -14,6 +14,7 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    search_all,
     tag_summary,
     collect_tags,
     checklist_progress,
@@ -168,6 +169,9 @@ def build_parser() -> argparse.ArgumentParser:
     checklist_progress_cmd.add_argument("--checklist", required=True)
 
     subparsers.add_parser("tag-list")
+
+    search_cmd = subparsers.add_parser("search")
+    search_cmd.add_argument("--query", required=True)
     return parser
 
 
@@ -345,6 +349,12 @@ def main(argv: list[str] | None = None) -> int:
         state = load_state(args.data)
         for tag in collect_tags(state):
             print(tag)
+        return 0
+
+
+    if args.command == "search":
+        state = load_state(args.data)
+        print(json.dumps(search_all(state, args.query), ensure_ascii=False, sort_keys=True))
         return 0
 
     parser.print_help()

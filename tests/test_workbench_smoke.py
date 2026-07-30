@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    search_all,
     tag_summary,
     collect_tags,
     is_overdue,
@@ -456,6 +457,16 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(collect_tags(state), ["urgent", "work"])
         self.assertEqual(tag_summary(state)["work"], 2)
+
+    def test_search_all(self) -> None:
+        state = WorkbenchState()
+        note = create_note(state, "Alpha plan", "body")
+        create_task(state, "Beta task")
+
+        results = search_all(state, "alpha")
+
+        self.assertEqual(results["notes"], [note.id])
+        self.assertEqual(results["tasks"], [])
 
 
 

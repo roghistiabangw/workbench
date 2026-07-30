@@ -277,3 +277,23 @@ def tag_summary(state: WorkbenchState) -> dict[str, int]:
                 counts[tag] = counts.get(tag, 0) + 1
     return counts
 
+
+def search_all(state: WorkbenchState, query: str) -> dict[str, list[str]]:
+    needle = query.strip().lower()
+    results: dict[str, list[str]] = {"notes": [], "tasks": [], "snippets": [], "checklists": []}
+    if not needle:
+        return results
+    for note in state.notes:
+        if needle in " ".join([note.title, note.body, " ".join(note.tags)]).lower():
+            results["notes"].append(note.id)
+    for task in state.tasks:
+        if needle in " ".join([task.title, task.owner, " ".join(task.tags)]).lower():
+            results["tasks"].append(task.id)
+    for snippet in state.snippets:
+        if needle in " ".join([snippet.title, snippet.language, snippet.body, " ".join(snippet.tags)]).lower():
+            results["snippets"].append(snippet.id)
+    for checklist in state.checklists:
+        if needle in " ".join([checklist.name, checklist.description]).lower():
+            results["checklists"].append(checklist.id)
+    return results
+
