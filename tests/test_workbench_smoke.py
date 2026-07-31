@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    render_table,
     search_all,
     tag_summary,
     collect_tags,
@@ -467,6 +468,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(results["notes"], [note.id])
         self.assertEqual(results["tasks"], [])
+
+    def test_render_table(self) -> None:
+        table = render_table(["ID", "Title"], [["1", "Alpha"], ["22", "Beta"]])
+        lines = table.splitlines()
+
+        self.assertEqual(lines[0], "ID  Title")
+        self.assertEqual(lines[2], "1   Alpha")
 
 
 
