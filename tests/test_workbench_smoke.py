@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    render_task_detail,
+    render_note_detail,
     render_table,
     search_all,
     tag_summary,
@@ -475,6 +477,18 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(lines[0], "ID  Title")
         self.assertEqual(lines[2], "1   Alpha")
+
+    def test_detail_renderers(self) -> None:
+        state = WorkbenchState()
+        note = create_note(state, "Title", "Body text", ["a"])
+        task = create_task(state, "Do it", priority="high")
+
+        note_detail = render_note_detail(note)
+        task_detail = render_task_detail(task)
+
+        self.assertIn("Note " + note.id, note_detail)
+        self.assertIn("Body text", note_detail)
+        self.assertIn("Priority: high", task_detail)
 
 
 

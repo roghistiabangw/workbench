@@ -14,3 +14,25 @@ def render_table(headers: list[str], rows: list[list[str]]) -> str:
         cells = [str(row[i]).ljust(widths[i]) for i in range(len(columns))]
         lines.append("  ".join(cells).rstrip())
     return "\n".join(lines)
+
+
+def render_note_detail(note) -> str:
+    tags = ", ".join(note.tags) if note.tags else "-"
+    return "\n".join([
+        f"Note {note.id}",
+        f"Title: {note.title}",
+        f"Tags: {tags}",
+        "",
+        note.body,
+    ])
+
+
+def render_task_detail(task) -> str:
+    return "\n".join([
+        f"Task {task.id}",
+        f"Title: {task.title}",
+        f"Status: {task.status}",
+        f"Priority: {task.priority}",
+        f"Owner: {task.owner or '-'}",
+        f"Due: {task.due_date or '-'}",
+    ])
