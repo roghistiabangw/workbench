@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    default_settings,
     render_task_detail,
     render_note_detail,
     render_table,
@@ -489,6 +490,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertIn("Note " + note.id, note_detail)
         self.assertIn("Body text", note_detail)
         self.assertIn("Priority: high", task_detail)
+
+    def test_settings_defaults(self) -> None:
+        settings = default_settings()
+
+        self.assertEqual(settings.data_path, "workbench.json")
+        self.assertEqual(settings.output_width, 80)
+        self.assertEqual(settings.to_dict()["date_format"], "%Y-%m-%d")
 
 
 
