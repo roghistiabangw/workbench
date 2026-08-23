@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    validate_settings,
+    load_settings,
     default_settings,
     render_task_detail,
     render_note_detail,
@@ -497,6 +499,20 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(settings.data_path, "workbench.json")
         self.assertEqual(settings.output_width, 80)
         self.assertEqual(settings.to_dict()["date_format"], "%Y-%m-%d")
+
+    def test_load_settings(self) -> None:
+        import json as _json
+        import tempfile
+        from pathlib import Path as _Path
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = _Path(tmp) / "cfg.json"
+            path.write_text(_json.dumps({"output_width": 120}), encoding="utf-8")
+            settings = load_settings(path)
+
+        self.assertEqual(settings.output_width, 120)
+        with self.assertRaises(ValueError):
+            validate_settings({"bad": 1})
 
 
 

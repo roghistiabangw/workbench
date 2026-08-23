@@ -4,7 +4,7 @@ from collections.abc import Iterable
 
 from .models import Note, Task, WorkbenchState, generate_short_id, utc_now, Snippet, ProjectChecklist, ChecklistItem
 from .validation import normalize_tags, require_text, validate_task_priority, validate_task_status
-from .settings import WorkbenchSettings, default_settings
+from .settings import WorkbenchSettings, default_settings, load_settings, validate_settings
 from .renderers import render_table, render_note_detail, render_task_detail
 from .dateutils import parse_date, format_date, days_until, is_overdue
 
