@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    import_state,
     validate_settings,
     load_settings,
     default_settings,
@@ -513,6 +514,18 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(settings.output_width, 120)
         with self.assertRaises(ValueError):
             validate_settings({"bad": 1})
+
+    def test_import_state_merge(self) -> None:
+        current = WorkbenchState()
+        create_note(current, "Keep", "body")
+        incoming = WorkbenchState()
+        create_note(incoming, "New", "body")
+
+        merged = import_state(current, incoming, "merge")
+
+        self.assertEqual(len(merged.notes), 2)
+        replaced = import_state(current, incoming, "replace")
+        self.assertEqual(len(replaced.notes), 1)
 
 
 
