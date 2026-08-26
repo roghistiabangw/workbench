@@ -36,3 +36,20 @@ def import_state_file(current: WorkbenchState, path: Path, mode: str = "merge") 
     data = json.loads(path.read_text(encoding="utf-8"))
     incoming = WorkbenchState.from_dict(data)
     return import_state(current, incoming, mode)
+
+
+def export_state(state: WorkbenchState) -> dict:
+    return state.to_dict()
+
+
+def export_records(state: WorkbenchState, kinds: list[str] | None = None) -> dict:
+    full = state.to_dict()
+    if not kinds:
+        return full
+    allowed = {"notes", "tasks", "snippets", "checklists"}
+    selected: dict = {}
+    for kind in kinds:
+        if kind not in allowed:
+            raise ValueError(f"Unknown record kind: {kind}")
+        selected[kind] = full[kind]
+    return selected

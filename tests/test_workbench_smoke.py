@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    export_records,
+    export_state,
     import_state,
     validate_settings,
     load_settings,
@@ -526,6 +528,17 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(len(merged.notes), 2)
         replaced = import_state(current, incoming, "replace")
         self.assertEqual(len(replaced.notes), 1)
+
+    def test_export_records_filtered(self) -> None:
+        state = WorkbenchState()
+        create_note(state, "N", "b")
+        create_task(state, "T")
+
+        only_notes = export_records(state, ["notes"])
+
+        self.assertIn("notes", only_notes)
+        self.assertNotIn("tasks", only_notes)
+        self.assertEqual(len(export_state(state)["tasks"]), 1)
 
 
 
