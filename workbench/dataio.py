@@ -53,3 +53,27 @@ def export_records(state: WorkbenchState, kinds: list[str] | None = None) -> dic
             raise ValueError(f"Unknown record kind: {kind}")
         selected[kind] = full[kind]
     return selected
+
+
+def export_tasks_csv(state: WorkbenchState) -> str:
+    import csv
+    import io
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["id", "title", "status", "priority", "owner", "due_date"])
+    for task in state.tasks:
+        writer.writerow([task.id, task.title, task.status, task.priority, task.owner, task.due_date])
+    return buffer.getvalue()
+
+
+def export_notes_csv(state: WorkbenchState) -> str:
+    import csv
+    import io
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["id", "title", "tags"])
+    for note in state.notes:
+        writer.writerow([note.id, note.title, ";".join(note.tags)])
+    return buffer.getvalue()

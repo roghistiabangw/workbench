@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    export_notes_csv,
+    export_tasks_csv,
     export_records,
     export_state,
     import_state,
@@ -539,6 +541,17 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertIn("notes", only_notes)
         self.assertNotIn("tasks", only_notes)
         self.assertEqual(len(export_state(state)["tasks"]), 1)
+
+    def test_export_tasks_csv(self) -> None:
+        state = WorkbenchState()
+        create_task(state, "Task A", priority="high", owner="me")
+
+        csv_text = export_tasks_csv(state)
+        lines = csv_text.strip().splitlines()
+
+        self.assertEqual(lines[0], "id,title,status,priority,owner,due_date")
+        self.assertIn("Task A", lines[1])
+        self.assertIn("high", lines[1])
 
 
 
