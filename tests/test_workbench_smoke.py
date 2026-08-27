@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    backup_name,
+    create_backup,
     export_notes_csv,
     export_tasks_csv,
     export_records,
@@ -552,6 +554,20 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(lines[0], "id,title,status,priority,owner,due_date")
         self.assertIn("Task A", lines[1])
         self.assertIn("high", lines[1])
+
+    def test_create_backup(self) -> None:
+        import tempfile
+        from datetime import datetime, timezone
+        from pathlib import Path as _Path
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = _Path(tmp) / "workbench.json"
+            source.write_text("{}", encoding="utf-8")
+            when = datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+            backup = create_backup(source, _Path(tmp) / "backups", when)
+            self.assertTrue(backup.exists())
+
+        self.assertEqual(backup.name, "workbench-20260102-030405.json")
 
 
 
