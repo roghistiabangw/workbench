@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    restore_backup,
     backup_name,
     create_backup,
     export_notes_csv,
@@ -568,6 +569,20 @@ class WorkbenchSmokeTests(unittest.TestCase):
             self.assertTrue(backup.exists())
 
         self.assertEqual(backup.name, "workbench-20260102-030405.json")
+
+    def test_restore_backup(self) -> None:
+        import json as _json
+        import tempfile
+        from pathlib import Path as _Path
+
+        with tempfile.TemporaryDirectory() as tmp:
+            backup = _Path(tmp) / "b.json"
+            backup.write_text(_json.dumps({"schema_version": 1}), encoding="utf-8")
+            target = _Path(tmp) / "restored.json"
+            restore_backup(backup, target)
+            restored = _json.loads(target.read_text(encoding="utf-8"))
+
+        self.assertEqual(restored["schema_version"], 1)
 
 
 

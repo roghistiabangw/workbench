@@ -19,3 +19,14 @@ def create_backup(source: Path, backup_dir: Path, now: datetime | None = None) -
     else:
         target.write_text("{}", encoding="utf-8")
     return target
+
+
+def restore_backup(backup_path: Path, target: Path) -> Path:
+    if not backup_path.exists():
+        raise ValueError(f"Backup not found: {backup_path}")
+    data = json.loads(backup_path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("Backup must contain a JSON object")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return target
