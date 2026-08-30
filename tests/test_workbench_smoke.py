@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    CURRENT_SCHEMA_VERSION,
+    migrate_state,
     restore_backup,
     backup_name,
     create_backup,
@@ -583,6 +585,12 @@ class WorkbenchSmokeTests(unittest.TestCase):
             restored = _json.loads(target.read_text(encoding="utf-8"))
 
         self.assertEqual(restored["schema_version"], 1)
+
+    def test_migrate_state(self) -> None:
+        migrated = migrate_state({"notes": [], "schema_version": 1})
+        self.assertEqual(migrated["schema_version"], CURRENT_SCHEMA_VERSION)
+        with self.assertRaises(ValueError):
+            migrate_state({"schema_version": 999})
 
 
 
