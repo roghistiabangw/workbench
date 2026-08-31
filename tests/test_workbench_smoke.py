@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    check_integrity,
     CURRENT_SCHEMA_VERSION,
     migrate_state,
     restore_backup,
@@ -591,6 +592,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(migrated["schema_version"], CURRENT_SCHEMA_VERSION)
         with self.assertRaises(ValueError):
             migrate_state({"schema_version": 999})
+
+    def test_check_integrity(self) -> None:
+        state = WorkbenchState()
+        task = create_task(state, "Ok")
+        self.assertEqual(check_integrity(state), [])
+        state.tasks.append(task)
+        problems = check_integrity(state)
+        self.assertTrue(any("duplicate id" in problem for problem in problems))
 
 
 
