@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    repair_state,
     check_integrity,
     CURRENT_SCHEMA_VERSION,
     migrate_state,
@@ -600,6 +601,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
         state.tasks.append(task)
         problems = check_integrity(state)
         self.assertTrue(any("duplicate id" in problem for problem in problems))
+
+    def test_repair_state(self) -> None:
+        state = WorkbenchState()
+        task = create_task(state, "Ok")
+        state.tasks.append(task)
+        actions = repair_state(state)
+        self.assertEqual(len(state.tasks), 1)
+        self.assertTrue(actions)
 
 
 
