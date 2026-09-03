@@ -303,3 +303,17 @@ def search_all(state: WorkbenchState, query: str) -> dict[str, list[str]]:
             results["checklists"].append(checklist.id)
     return results
 
+
+def plan_mutation(action: str, target: str, details: str = "") -> dict:
+    return {
+        "action": action,
+        "target": target,
+        "details": details,
+        "applied": False,
+    }
+
+
+def describe_plan(plan: dict) -> str:
+    suffix = f" ({plan['details']})" if plan.get("details") else ""
+    return f"DRY-RUN {plan['action']} {plan['target']}{suffix}"
+

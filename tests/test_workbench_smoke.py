@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    describe_plan,
+    plan_mutation,
     repair_state,
     check_integrity,
     CURRENT_SCHEMA_VERSION,
@@ -609,6 +611,11 @@ class WorkbenchSmokeTests(unittest.TestCase):
         actions = repair_state(state)
         self.assertEqual(len(state.tasks), 1)
         self.assertTrue(actions)
+
+    def test_dry_run_plan(self) -> None:
+        plan = plan_mutation("delete", "task-1", "no confirm")
+        self.assertFalse(plan["applied"])
+        self.assertEqual(describe_plan(plan), "DRY-RUN delete task-1 (no confirm)")
 
 
 
