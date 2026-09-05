@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    UndoStack,
     describe_plan,
     plan_mutation,
     repair_state,
@@ -616,6 +617,16 @@ class WorkbenchSmokeTests(unittest.TestCase):
         plan = plan_mutation("delete", "task-1", "no confirm")
         self.assertFalse(plan["applied"])
         self.assertEqual(describe_plan(plan), "DRY-RUN delete task-1 (no confirm)")
+
+    def test_undo_stack(self) -> None:
+        stack = UndoStack()
+        self.assertFalse(stack.can_undo())
+        stack.snapshot({"count": 1})
+        stack.snapshot({"count": 2})
+        self.assertEqual(stack.undo(), {"count": 2})
+        self.assertEqual(stack.undo(), {"count": 1})
+        with self.assertRaises(ValueError):
+            stack.undo()
 
 
 
