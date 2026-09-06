@@ -628,6 +628,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             stack.undo()
 
+    def test_parser_has_description(self) -> None:
+        from workbench.cli import build_parser
+
+        parser = build_parser()
+
+        self.assertTrue(parser.description)
+
 
 
 if __name__ == "__main__":

@@ -85,7 +85,7 @@ def demo_state() -> WorkbenchState:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="workbench")
+    parser = argparse.ArgumentParser(prog="workbench", description="Workbench: local notes, tasks, snippets, and checklists.")
     parser.add_argument("--data", type=Path, default=Path("workbench.json"))
     subparsers = parser.add_subparsers(dest="command")
     subparsers.add_parser("demo")
