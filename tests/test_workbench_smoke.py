@@ -635,6 +635,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertTrue(parser.description)
 
+    def test_note_update_and_validation(self) -> None:
+        state = WorkbenchState()
+        note = create_note(state, "Original", "body", ["x"])
+        updated = update_note(state, note.id, title="Renamed")
+        self.assertEqual(updated.title, "Renamed")
+        with self.assertRaises(ValueError):
+            create_note(state, "   ", "body")
+
 
 
 if __name__ == "__main__":
