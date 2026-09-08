@@ -643,6 +643,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             create_note(state, "   ", "body")
 
+    def test_task_workflow_and_filters(self) -> None:
+        state = WorkbenchState()
+        task = create_task(state, "Ship", priority="high", owner="me")
+        update_task_status(state, task.id, "done")
+        self.assertEqual(get_task(state, task.id).status, "done")
+        results = filter_tasks(state, "done", None, None, None, None, None)
+        self.assertEqual(results, [get_task(state, task.id)])
+
 
 
 if __name__ == "__main__":
