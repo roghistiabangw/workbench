@@ -651,6 +651,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
         results = filter_tasks(state, "done", None, None, None, None, None)
         self.assertEqual(results, [get_task(state, task.id)])
 
+    def test_snippet_search_and_export(self) -> None:
+        state = WorkbenchState()
+        first = create_snippet(state, "Quicksort", "python", "partition")
+        create_snippet(state, "Router", "go", "mux")
+        self.assertEqual(search_snippets(state, "quick"), [first])
+        self.assertEqual(len(export_snippets(state)), 2)
+
 
 
 if __name__ == "__main__":
