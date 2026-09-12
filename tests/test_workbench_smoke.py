@@ -658,6 +658,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(search_snippets(state, "quick"), [first])
         self.assertEqual(len(export_snippets(state)), 2)
 
+    def test_checklist_items_and_progress(self) -> None:
+        state = WorkbenchState()
+        checklist = create_checklist(state, "Ship")
+        first = add_checklist_item(state, checklist.id, "A")
+        add_checklist_item(state, checklist.id, "B")
+        set_checklist_item_done(state, checklist.id, first.id)
+        self.assertEqual(checklist_progress(state, checklist.id)["percent"], 50)
+
 
 
 if __name__ == "__main__":
