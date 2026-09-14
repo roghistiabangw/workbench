@@ -666,6 +666,19 @@ class WorkbenchSmokeTests(unittest.TestCase):
         set_checklist_item_done(state, checklist.id, first.id)
         self.assertEqual(checklist_progress(state, checklist.id)["percent"], 50)
 
+    def test_storage_round_trip_extra(self) -> None:
+        import tempfile
+        from pathlib import Path as _Path
+
+        state = WorkbenchState()
+        create_note(state, "Persist", "body")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = _Path(tmp) / "wb.json"
+            save_state(path, state)
+            loaded = load_state(path)
+
+        self.assertEqual(len(loaded.notes), 1)
+
 
 
 if __name__ == "__main__":
