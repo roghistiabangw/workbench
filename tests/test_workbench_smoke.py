@@ -679,6 +679,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(len(loaded.notes), 1)
 
+    def test_readme_has_quickstart(self) -> None:
+        from pathlib import Path
+
+        text = Path("README.md").read_text(encoding="utf-8")
+
+        self.assertIn("## Quickstart", text)
+
 
 
 if __name__ == "__main__":

@@ -20,3 +20,12 @@ python -m workbench.cli summary
 
 The repository is planned as an incremental multi-file project. Each stage
 should make one cohesive improvement and keep tests passing.
+
+
+## Quickstart
+
+```
+python -m workbench demo
+python -m workbench note-add --title "First" --body "Hello"
+python -m workbench note-list
+```
