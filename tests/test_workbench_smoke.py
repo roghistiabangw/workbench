@@ -686,6 +686,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertIn("## Quickstart", text)
 
+    def test_readme_has_workflows(self) -> None:
+        from pathlib import Path
+
+        text = Path("README.md").read_text(encoding="utf-8")
+
+        self.assertIn("## Workflows", text)
+
 
 
 if __name__ == "__main__":

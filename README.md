@@ -29,3 +29,11 @@ python -m workbench demo
 python -m workbench note-add --title "First" --body "Hello"
 python -m workbench note-list
 ```
+
+
+## Workflows
+
+- Daily notes: `note-add`, then `note-list` and `note-show`.
+- Task review: `task-add`, `task-status`, and `task-list --status todo`.
+- Snippet capture: `snippet-add` and `snippet-search`.
+- Project checklists: `checklist-add`, `checklist-item-add`, `checklist-progress`.
