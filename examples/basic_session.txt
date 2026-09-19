@@ -1,0 +1,3 @@
+python -m workbench demo
+python -m workbench note-add --title First
+python -m workbench note-list
