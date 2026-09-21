@@ -699,6 +699,11 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertTrue(Path("examples/demo_state.json").exists())
         self.assertTrue(Path("examples/basic_session.txt").exists())
 
+    def test_developer_notes_present(self) -> None:
+        from pathlib import Path
+
+        self.assertTrue(Path("docs/DEVELOPERS.md").exists())
+
 
 
 if __name__ == "__main__":
