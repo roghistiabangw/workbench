@@ -4,6 +4,7 @@ from collections.abc import Iterable
 
 from .models import Note, Task, WorkbenchState, generate_short_id, utc_now, Snippet, ProjectChecklist, ChecklistItem
 from .validation import normalize_tags, require_text, validate_task_priority, validate_task_status
+from .reports import daily_review
 from .history import UndoStack
 from .integrity import check_integrity, repair_state
 from .migrations import migrate_state, CURRENT_SCHEMA_VERSION

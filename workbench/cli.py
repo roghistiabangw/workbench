@@ -14,6 +14,7 @@ from .models import (
 )
 from .storage import load_state, save_state
 from .services import (
+    daily_review,
     search_all,
     tag_summary,
     collect_tags,
@@ -172,6 +173,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     search_cmd = subparsers.add_parser("search")
     search_cmd.add_argument("--query", required=True)
+
+    subparsers.add_parser("review")
     return parser
 
 
@@ -355,6 +358,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "search":
         state = load_state(args.data)
         print(json.dumps(search_all(state, args.query), ensure_ascii=False, sort_keys=True))
+        return 0
+
+
+    if args.command == "review":
+        state = load_state(args.data)
+        print(json.dumps(daily_review(state), ensure_ascii=False, sort_keys=True))
         return 0
 
     parser.print_help()

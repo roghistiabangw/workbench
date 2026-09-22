@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    daily_review,
     UndoStack,
     describe_plan,
     plan_mutation,
@@ -703,6 +704,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
         from pathlib import Path
 
         self.assertTrue(Path("docs/DEVELOPERS.md").exists())
+
+    def test_daily_review(self) -> None:
+        state = WorkbenchState()
+        create_task(state, "Open one")
+        review = daily_review(state)
+
+        self.assertEqual(review["open_tasks"], 1)
+        self.assertEqual(review["active_checklists"], 0)
 
 
 
