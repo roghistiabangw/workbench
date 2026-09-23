@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    weekly_report,
     daily_review,
     UndoStack,
     describe_plan,
@@ -712,6 +713,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(review["open_tasks"], 1)
         self.assertEqual(review["active_checklists"], 0)
+
+    def test_weekly_report(self) -> None:
+        state = WorkbenchState()
+        task = create_task(state, "Finish")
+        update_task_status(state, task.id, "done")
+        report = weekly_report(state)
+
+        self.assertEqual(report["tasks_done"], 1)
 
 
 
