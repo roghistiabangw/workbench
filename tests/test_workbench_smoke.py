@@ -15,6 +15,9 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    find_view,
+    add_view,
+    SavedView,
     weekly_report,
     daily_review,
     UndoStack,
@@ -721,6 +724,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
         report = weekly_report(state)
 
         self.assertEqual(report["tasks_done"], 1)
+
+    def test_saved_views(self) -> None:
+        views: list = []
+        add_view(views, SavedView("open-tasks", "task", {"status": "todo"}))
+
+        self.assertEqual(find_view(views, "open-tasks").filters["status"], "todo")
+        with self.assertRaises(ValueError):
+            add_view(views, SavedView("open-tasks", "task"))
 
 
 
