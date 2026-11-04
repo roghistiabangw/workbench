@@ -15,6 +15,9 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    checklist_template,
+    task_template,
+    note_template,
     find_view,
     add_view,
     SavedView,
@@ -732,6 +735,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(find_view(views, "open-tasks").filters["status"], "todo")
         with self.assertRaises(ValueError):
             add_view(views, SavedView("open-tasks", "task"))
+
+    def test_templates(self) -> None:
+        note = note_template("Research")
+        checklist = checklist_template("Launch")
+
+        self.assertEqual(note["tags"], ["research"])
+        self.assertEqual(len(checklist["items"]), 3)
 
 
 
