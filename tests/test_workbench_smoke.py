@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    generate_occurrences,
+    next_occurrence,
     checklist_template,
     task_template,
     note_template,
@@ -742,6 +744,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(note["tags"], ["research"])
         self.assertEqual(len(checklist["items"]), 3)
+
+    def test_recurring_tasks(self) -> None:
+        from datetime import date
+
+        self.assertEqual(next_occurrence(date(2026, 1, 31), "monthly"), date(2026, 2, 28))
+        self.assertEqual(len(generate_occurrences(date(2026, 1, 1), "daily", 3)), 3)
+        with self.assertRaises(ValueError):
+            next_occurrence(date(2026, 1, 1), "yearly")
 
 
 

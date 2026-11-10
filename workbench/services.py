@@ -4,6 +4,7 @@ from collections.abc import Iterable
 
 from .models import Note, Task, WorkbenchState, generate_short_id, utc_now, Snippet, ProjectChecklist, ChecklistItem
 from .validation import normalize_tags, require_text, validate_task_priority, validate_task_status
+from .recurring import next_occurrence, generate_occurrences
 from .templates import note_template, task_template, checklist_template
 from .views import SavedView, add_view, find_view
 from .reports import daily_review, weekly_report
