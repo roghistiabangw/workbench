@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    suggest_next_actions,
     generate_occurrences,
     next_occurrence,
     checklist_template,
@@ -752,6 +753,15 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(len(generate_occurrences(date(2026, 1, 1), "daily", 3)), 3)
         with self.assertRaises(ValueError):
             next_occurrence(date(2026, 1, 1), "yearly")
+
+    def test_priority_suggestions(self) -> None:
+        state = WorkbenchState()
+        create_task(state, "Low", priority="low")
+        urgent = create_task(state, "Urgent", priority="urgent")
+
+        suggestions = suggest_next_actions(state)
+
+        self.assertEqual(suggestions[0], urgent.id)
 
 
 
