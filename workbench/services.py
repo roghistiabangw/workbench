@@ -13,7 +13,7 @@ from .history import UndoStack
 from .integrity import check_integrity, repair_state
 from .migrations import migrate_state, CURRENT_SCHEMA_VERSION
 from .backup import create_backup, backup_name, restore_backup
-from .dataio import import_state, import_state_file, export_state, export_records, export_tasks_csv, export_notes_csv
+from .dataio import import_state, import_state_file, export_state, export_records, export_tasks_csv, export_notes_csv, import_text
 from .settings import WorkbenchSettings, default_settings, load_settings, validate_settings
 from .renderers import render_table, render_note_detail, render_task_detail
 from .dateutils import parse_date, format_date, days_until, is_overdue

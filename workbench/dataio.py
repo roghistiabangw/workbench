@@ -77,3 +77,20 @@ def export_notes_csv(state: WorkbenchState) -> str:
     for note in state.notes:
         writer.writerow([note.id, note.title, ";".join(note.tags)])
     return buffer.getvalue()
+
+
+def import_text(state: WorkbenchState, text: str) -> dict:
+    from .services import create_note, create_task
+
+    added = {"notes": 0, "tasks": 0}
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.lower().startswith("task:"):
+            create_task(state, stripped[5:].strip())
+            added["tasks"] += 1
+        else:
+            create_note(state, stripped, "")
+            added["notes"] += 1
+    return added

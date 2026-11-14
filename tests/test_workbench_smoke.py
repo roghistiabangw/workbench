@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    import_text,
     suggest_next_actions,
     generate_occurrences,
     next_occurrence,
@@ -762,6 +763,13 @@ class WorkbenchSmokeTests(unittest.TestCase):
         suggestions = suggest_next_actions(state)
 
         self.assertEqual(suggestions[0], urgent.id)
+
+    def test_import_text(self) -> None:
+        state = WorkbenchState()
+        added = import_text(state, "First note\ntask: Do it\n\nSecond note")
+
+        self.assertEqual(added["tasks"], 1)
+        self.assertEqual(added["notes"], 2)
 
 
 
