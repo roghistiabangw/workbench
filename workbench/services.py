@@ -8,7 +8,7 @@ from .suggestions import suggest_next_actions
 from .recurring import next_occurrence, generate_occurrences
 from .templates import note_template, task_template, checklist_template
 from .views import SavedView, add_view, find_view
-from .reports import daily_review, weekly_report
+from .reports import daily_review, weekly_report, export_markdown
 from .history import UndoStack
 from .integrity import check_integrity, repair_state
 from .migrations import migrate_state, CURRENT_SCHEMA_VERSION

@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    export_markdown,
     import_text,
     suggest_next_actions,
     generate_occurrences,
@@ -770,6 +771,15 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertEqual(added["tasks"], 1)
         self.assertEqual(added["notes"], 2)
+
+    def test_markdown_export(self) -> None:
+        state = WorkbenchState()
+        create_note(state, "N", "b")
+
+        markdown = export_markdown(state)
+
+        self.assertIn("# Workbench Report", markdown)
+        self.assertIn("- Notes: 1", markdown)
 
 
 

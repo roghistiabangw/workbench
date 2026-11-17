@@ -27,3 +27,12 @@ def weekly_report(state: WorkbenchState) -> dict:
         "snippets_total": len(state.snippets),
         "avg_checklist_progress": checklist_progress,
     }
+
+
+def export_markdown(state: WorkbenchState) -> str:
+    lines = ["# Workbench Report", ""]
+    lines.append(f"- Notes: {len(state.notes)}")
+    lines.append(f"- Tasks: {len(state.tasks)}")
+    lines.append(f"- Snippets: {len(state.snippets)}")
+    lines.append(f"- Checklists: {len(state.checklists)}")
+    return "\n".join(lines) + "\n"
