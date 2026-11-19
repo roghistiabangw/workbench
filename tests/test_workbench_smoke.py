@@ -15,6 +15,7 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    redact_export,
     export_markdown,
     import_text,
     suggest_next_actions,
@@ -780,6 +781,14 @@ class WorkbenchSmokeTests(unittest.TestCase):
 
         self.assertIn("# Workbench Report", markdown)
         self.assertIn("- Notes: 1", markdown)
+
+    def test_data_redaction(self) -> None:
+        data = {"notes": [{"id": "n1", "body": "secret", "title": "Public"}], "schema_version": 1}
+        redacted = redact_export(data)
+
+        self.assertEqual(redacted["notes"][0]["body"], "[redacted]")
+        self.assertEqual(redacted["notes"][0]["title"], "Public")
+        self.assertEqual(redacted["schema_version"], 1)
 
 
 
