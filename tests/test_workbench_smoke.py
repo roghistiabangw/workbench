@@ -15,6 +15,10 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    friendly_message,
+    ValidationError,
+    NotFoundError,
+    WorkbenchError,
     redact_export,
     export_markdown,
     import_text,
@@ -789,6 +793,10 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(redacted["notes"][0]["body"], "[redacted]")
         self.assertEqual(redacted["notes"][0]["title"], "Public")
         self.assertEqual(redacted["schema_version"], 1)
+
+    def test_error_hierarchy(self) -> None:
+        self.assertEqual(friendly_message(NotFoundError("task-1")), "Not found: task-1")
+        self.assertTrue(issubclass(ValidationError, WorkbenchError))
 
 
 
