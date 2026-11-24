@@ -798,6 +798,12 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertEqual(friendly_message(NotFoundError("task-1")), "Not found: task-1")
         self.assertTrue(issubclass(ValidationError, WorkbenchError))
 
+    def test_api_surface(self) -> None:
+        from workbench import api
+
+        self.assertTrue(hasattr(api, "services"))
+        self.assertTrue(callable(api.load))
+
 
 
 if __name__ == "__main__":
