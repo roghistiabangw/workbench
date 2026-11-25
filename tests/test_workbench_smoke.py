@@ -804,6 +804,26 @@ class WorkbenchSmokeTests(unittest.TestCase):
         self.assertTrue(hasattr(api, "services"))
         self.assertTrue(callable(api.load))
 
+    def test_cli_command_smoke(self) -> None:
+        import tempfile
+        from pathlib import Path as _Path
+        from workbench.cli import main
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data = _Path(tmp) / "wb.json"
+            for argv in (
+                ["demo"],
+                ["note-add", "--title", "Hi"],
+                ["note-list"],
+                ["task-add", "--title", "Do"],
+                ["task-list"],
+                ["summary"],
+                ["tag-list"],
+                ["review"],
+                ["weekly-report"],
+            ):
+                self.assertEqual(main(["--data", str(data), *argv]), 0)
+
 
 
 if __name__ == "__main__":
