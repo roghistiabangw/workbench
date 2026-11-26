@@ -325,3 +325,14 @@ def describe_plan(plan: dict) -> str:
     suffix = f" ({plan['details']})" if plan.get("details") else ""
     return f"DRY-RUN {plan['action']} {plan['target']}{suffix}"
 
+
+def build_task_index(state: WorkbenchState) -> dict:
+    return {task.id: task for task in state.tasks}
+
+
+def find_task_fast(index: dict, task_id: str):
+    task = index.get(task_id)
+    if task is None:
+        raise ValueError(f"Unknown task ID: {task_id}")
+    return task
+

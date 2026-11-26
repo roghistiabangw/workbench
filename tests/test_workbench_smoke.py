@@ -15,6 +15,8 @@ from workbench.models import (
 )
 from workbench.storage import load_state, save_state
 from workbench.services import (
+    find_task_fast,
+    build_task_index,
     friendly_message,
     ValidationError,
     NotFoundError,
@@ -823,6 +825,15 @@ class WorkbenchSmokeTests(unittest.TestCase):
                 ["weekly-report"],
             ):
                 self.assertEqual(main(["--data", str(data), *argv]), 0)
+
+    def test_task_index_lookup(self) -> None:
+        state = WorkbenchState()
+        task = create_task(state, "Indexed")
+        index = build_task_index(state)
+
+        self.assertIs(find_task_fast(index, task.id), task)
+        with self.assertRaises(ValueError):
+            find_task_fast(index, "missing")
 
 
 
