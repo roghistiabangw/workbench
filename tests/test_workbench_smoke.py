@@ -835,6 +835,12 @@ class WorkbenchSmokeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             find_task_fast(index, "missing")
 
+    def test_version_constant(self) -> None:
+        import workbench
+
+        self.assertEqual(workbench.__version__, "0.1.0")
+        self.assertEqual(workbench.PROJECT_NAME, "workbench")
+
 
 
 if __name__ == "__main__":
